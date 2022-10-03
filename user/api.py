@@ -6,7 +6,6 @@ from .crud import create_user, get_user, update_user, remove_book
 
 user_router = APIRouter()
 
-# test
 
 @user_router.get('/user', summary="Get user information")
 async def get_users(response: Response, db: session = Depends(connect_db)):
