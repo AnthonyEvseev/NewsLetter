@@ -1,5 +1,4 @@
 from fastapi import Depends
-
 from core.database import session, connect_db
 from core.models import UserModel
 from .schemas import UserSchemas, UserIDSchemas
