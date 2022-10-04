@@ -14,7 +14,7 @@ class NewsletterModel(Base):
     code = Column(String)
     tags = Column(String)
 
-    message = relationship('Message', back_populates='newsletter')
+    message = relationship('MessageModel', back_populates='newsletter')
 
 
 class UserModel(Base):
@@ -26,10 +26,10 @@ class UserModel(Base):
     tags = Column(String)
     time_zone = Column(String())
 
-    message = relationship('Message', back_populates='user')
+    message = relationship('MessageModel', back_populates='user')
 
 
-class Message(Base):
+class MessageModel(Base):
     __tablename__ = 'message'
 
     id = Column(Integer(), primary_key=True)

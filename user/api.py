@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Response, Depends
-from .schemas import UserSchemas, UserIDSchemas
+from user.schemas import UserSchemas, UserIDSchemas
 from core.database import session, connect_db
-from .crud import create_user, get_user, update_user, remove_book
+from user.crud import create_user, get_user, update_user, remove_book
 
 user_router = APIRouter()
 
