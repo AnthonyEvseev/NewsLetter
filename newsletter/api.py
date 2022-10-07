@@ -8,6 +8,6 @@ newsletter_router = APIRouter()
 header = {'Authorization': SECRET_TOKEN}
 
 
-@newsletter_router.get('/send_message', summary="test")
-async def send_message_test(text: str, tag: str, code: str = Query(max_length=3), db: session = Depends(connect_db)):
+@newsletter_router.get('/test', summary="test")
+async def test(text: str, tag: str, code: str = Query(max_length=3), db: session = Depends(connect_db)):
     return send_messages(text, tag, code, db)
