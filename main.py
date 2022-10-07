@@ -14,7 +14,9 @@ app.include_router(message_router, tags=["Message"])
 
 celery = Celery(__name__, broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
 celery.conf.imports = [
-    'newsletter.celery'
+    'newsletter.celery',
+    'newsletter.newsletter'
+
 ]
 
 if __name__ == '__main__':

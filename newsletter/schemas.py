@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class NewsLetter(BaseModel):
-    id: Optional[int] = None
+    # id: Optional[int] = None
     text: str
     date_start: datetime
     date_stop: datetime
