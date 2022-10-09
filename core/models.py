@@ -33,6 +33,7 @@ class MessageModel(Base):
     __tablename__ = 'message'
 
     id = Column(Integer(), primary_key=True)
+    id_celery = Column(String)
     date_send = Column(DateTime())
     status_send = Column(BOOLEAN)
 
