@@ -1,12 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status, Response, Depends
+from core.database import session, connect_db
 from enum import Enum
+
+from message.crud import get_message
 
 message_router = APIRouter()
 
 
-@message_router.get('/message', summary="Get information about message")
-async def get_user():
-    return 'get работает'
+@message_router.get('/all_message', summary="all_message")
+async def get_info(db: session = Depends(connect_db)):
+    return get_message(db)
 
 
 @message_router.post('/message', summary="Create a message")

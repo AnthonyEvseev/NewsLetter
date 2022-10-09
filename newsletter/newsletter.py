@@ -7,12 +7,14 @@ from core.config import URL_NEWSLETTERS, HEADER
 from core.database import session, connect_db
 from core.models import UserModel
 from message.crud import create_message
+from celery.result import AsyncResult
 
 
-def found_user(tag, code, db: session = Depends(connect_db)):
-    try:
-        return db.query(UserModel).filter(UserModel.code == code).filter(UserModel.tags == tag).all()
-    except:
+def found_user(tag: str, code: str = Query(max_length=50), db: session = Depends(connect_db)):
+    user = db.query(UserModel).filter(UserModel.code == code).filter(UserModel.tags == tag).all()
+    if user:
+        return user
+    else:
         raise {'response 404': 'Клиент не найден'}
 
 
@@ -38,14 +40,14 @@ def send_messages(time_start, user_id, phone, text):
         raise {'response 400': 'Ошибка внешнего сервиса'}
 
 
-# def create_task(time_start, text: str, tag: str, code: str = Query(max_length=3), db: session = Depends(connect_db)):
-#     user_data = create_user_data(tag, code, db)
-#     for user_id, phone in user_data.items():
-#         send_messages.delay(time_start, user_id, phone, text)
-
-def create_task(delta_time, text: str, tag: str, code: str = Query(max_length=3), db: session = Depends(connect_db)):
-    user_data = create_user_data(tag, code, db)
-    for user_id, phone in user_data.items():
-        task = send_messages.delay(delta_time.seconds, user_id, phone, text)
-        time_start = delta_time + datetime.datetime.now()
-        create_message(time_start, task.id, user_id)
+def create_task(id_news: int, delta_time: datetime, text: str, tag: str, code: str = Query(max_length=3),
+                db: session = Depends(connect_db)):
+    try:
+        user_data = create_user_data(tag, code, db)
+        for user_id, phone in user_data.items():
+            task = send_messages.delay(delta_time.seconds, user_id, phone, text)
+            time_start = delta_time + datetime.datetime.now()
+            status_task = AsyncResult(task.id)
+            create_message(id_news, time_start, task.id, status_task.status, user_id, db)
+    except:
+        raise {'response 404': 'Клиент не найден'}

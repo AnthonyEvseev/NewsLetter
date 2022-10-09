@@ -1,4 +1,6 @@
 from fastapi import Depends
+from typing import Any
+from datetime import datetime
 from core.database import session, connect_db
 from core.models import MessageModel
 
@@ -7,17 +9,16 @@ def get_message(db: session):
     return db.query(MessageModel).all()
 
 
-# def get_user_by_id(schemas: UserIDSchemas, db: session = Depends(connect_db)):
-#     return db.query(UserModel).filter(UserModel.id == schemas.id).first()
-
-
-def create_message(time_start, task_id, user_id, db: session = Depends(connect_db)):
+def create_message(id_news: int, time_start: datetime, task_id: str, status_task: str | Any, user_id: int,
+                   db: session = Depends(connect_db)):
     try:
-        _user = MessageModel(date_send=time_start, id_celery=task_id, id_user=user_id)
-        db.add(_user)
+        user = MessageModel(id_newsletter=id_news, date_send=time_start, id_celery=task_id,
+                            status_send=status_task,
+                            id_user=user_id)
+        db.add(user)
         db.commit()
-        db.refresh(_user)
-        return _user
+        db.refresh(user)
+        return user
     except:
         raise {'resource': 400}
 

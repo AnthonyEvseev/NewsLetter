@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Column, String, Integer, DateTime, BOOLEAN, ForeignKey
+from sqlalchemy import Column, String, Integer, Date, DateTime, ForeignKey
 
 Base = declarative_base()
 
@@ -9,8 +9,8 @@ class NewsletterModel(Base):
 
     id = Column(Integer(), primary_key=True)
     text = Column(String(300))
-    date_start = Column(DateTime())
-    date_stop = Column(DateTime())
+    date_start = Column(Date())
+    date_stop = Column(Date())
     code = Column(String)
     tags = Column(String)
 
@@ -34,8 +34,8 @@ class MessageModel(Base):
 
     id = Column(Integer(), primary_key=True)
     id_celery = Column(String)
-    date_send = Column(DateTime())
-    status_send = Column(BOOLEAN)
+    date_send = Column(DateTime)
+    status_send = Column(String)
 
     id_newsletter = Column(Integer, ForeignKey('newsletter.id'))
     id_user = Column(Integer, ForeignKey('user.id'))

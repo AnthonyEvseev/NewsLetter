@@ -1,7 +1,7 @@
 from fastapi import Depends
+from datetime import date
 from core.database import session, connect_db
 from core.models import NewsletterModel
-from .schemas import NewsLetter
 
 
 def get_history(db: session):
@@ -11,16 +11,17 @@ def get_history(db: session):
 # def create_history(schemas: NewsLetter, db: session = Depends(connect_db)):
 #     return db.query(UserModel).filter(UserModel.id == schemas.id).first()
 
-# def create_newsletter(time_start, db: session = Depends(connect_db)):
-#     try:
-#         newsletter = NewsletterModel(text=schemas.text, date_start=schemas.date_start, date_stop=schemas.date_stop,
-#                                      code=schemas.code, tags=schemas.tags)
-#         db.add(newsletter)
-#         db.commit()
-#         db.refresh(newsletter)
-#         return newsletter
-#     except:
-#         raise {'resource': 400}
+def create_newsletter_db(id_news: int, date_start: date, date_stop: date, text, tag, code,
+                         db: session = Depends(connect_db)):
+    try:
+        newsletter = NewsletterModel(id=id_news, date_start=date_start, date_stop=date_stop, text=text, tags=tag,
+                                     code=code)
+        db.add(newsletter)
+        db.commit()
+        db.refresh(newsletter)
+        return newsletter
+    except:
+        return {'resource': 400}
 
 # def update_user(schemas: UserSchemas, db: session = Depends(connect_db)):
 #     _user = get_user_by_id(schemas, db)
