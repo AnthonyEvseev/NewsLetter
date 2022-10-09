@@ -7,14 +7,6 @@ from newsletter.crud import create_newsletter_db
 newsletter_router = APIRouter()
 
 
-# @newsletter_router.get('/test', summary="send_message")
-# async def create_newslett123er(text: str, date_start: date, time_start: time, date_stop: date, time_stop: time,
-#                                tag: str,
-#                                code: str = Query(max_length=3),
-#                                db: session = Depends(connect_db)):
-#     return found_user(tag, code, db)
-
-
 @newsletter_router.get('/send_message', summary="send_message")
 async def create_newsletter(id_news: int, text: str, date_start: date, time_start: time, date_stop: date,
                             time_stop: time, tag: str,
@@ -28,12 +20,14 @@ async def create_newsletter(id_news: int, text: str, date_start: date, time_star
 
     if _date_start <= datetime.now() <= _date_stop:
         timer_start = timedelta(seconds=1)
+
+        # create_task(id_news, timer_start, text, tag, code, db)
         try:
             create_newsletter_db(id_news, _date_start, _date_stop, text, tag, code, db)
             create_task(id_news, timer_start, text, tag, code, db)
             return {'response 200': 'Рассылка отправлена'}
         except:
-            return {'response 404': 'Клиент не найден'}
+            return {'response 400': 'Клиент не найден или ID рассылки уже существует'}
     if _date_stop <= datetime.now() <= _date_start:
         return {'response 400': 'Вы ввели недопустимый интервал времени'}
     else:

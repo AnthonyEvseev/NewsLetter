@@ -9,16 +9,14 @@ def get_message(db: session):
     return db.query(MessageModel).all()
 
 
-def create_message(id_news: int, time_start: datetime, task_id: str, status_task: str | Any, user_id: int,
+def create_message(id_news: int, time_start: datetime, task_id: str, status: str, user_id: int,
                    db: session = Depends(connect_db)):
     try:
         user = MessageModel(id_newsletter=id_news, date_send=time_start, id_celery=task_id,
-                            status_send=status_task,
-                            id_user=user_id)
+                            id_user=user_id, status_send=status)
         db.add(user)
         db.commit()
         db.refresh(user)
-        return user
     except:
         raise {'resource': 400}
 

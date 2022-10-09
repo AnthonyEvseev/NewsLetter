@@ -40,6 +40,11 @@ def send_messages(time_start, user_id, phone, text):
         raise {'response 400': 'Ошибка внешнего сервиса'}
 
 
+# def create_task(time_start, text: str, tag: str, code: str = Query(max_length=3), db: session = Depends(connect_db)):
+#     user_data = create_user_data(tag, code, db)
+#     for user_id, phone in user_data.items():
+#         send_messages.delay(time_start, user_id, phone, text)
+
 def create_task(id_news: int, delta_time: datetime, text: str, tag: str, code: str = Query(max_length=3),
                 db: session = Depends(connect_db)):
     try:
@@ -48,6 +53,7 @@ def create_task(id_news: int, delta_time: datetime, text: str, tag: str, code: s
             task = send_messages.delay(delta_time.seconds, user_id, phone, text)
             time_start = delta_time + datetime.datetime.now()
             status_task = AsyncResult(task.id)
-            create_message(id_news, time_start, task.id, status_task.status, user_id, db)
+            status = str(status_task.status)
+            create_message(id_news, time_start, task.id, status, user_id, db)
     except:
         raise {'response 404': 'Клиент не найден'}
