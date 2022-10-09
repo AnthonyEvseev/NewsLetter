@@ -1,10 +1,11 @@
-import time
 from fastapi import Depends, Query
 from core.config import URL_NEWSLETTERS, SECRET_TOKEN
 from core.database import session, connect_db
 from core.models import UserModel
 from celery import shared_task
 import requests
+import time
+import datetime
 
 header = {'Authorization': SECRET_TOKEN}
 
@@ -22,8 +23,8 @@ def create_user_data(tag: str, code: str = Query(max_length=50), db: session = D
 
 
 @shared_task()
-def send(user_id, phone, text):
-    time.sleep(5)
+def send_messages(time_start, user_id, phone, text):
+    time.sleep(time_start)
     res = requests.post(f'{URL_NEWSLETTERS}{user_id}', headers=header, json={
         'id': user_id,
         'phone': phone,
@@ -32,8 +33,8 @@ def send(user_id, phone, text):
     return {'response': res.json()}
 
 
-def send_messages(text: str, tag: str, code: str = Query(max_length=3), db: session = Depends(connect_db)):
+def create_task(time_start, text: str, tag: str, code: str = Query(max_length=3), db: session = Depends(connect_db)):
     user_data = create_user_data(tag, code, db)
     res = []
     for user_id, phone in user_data.items():
-        res.append(send.delay(user_id, phone, text))
+        res.append(send_messages.delay(time_start, user_id, phone, text))
