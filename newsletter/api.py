@@ -1,7 +1,6 @@
 from datetime import time, datetime, date, timedelta
 from fastapi import APIRouter, Depends, Query
 from core.database import session, connect_db
-# from message.crud import check_status_message
 from newsletter.newsletter import create_task
 from newsletter.crud import create_newsletter_db, get_all_newsletter, get_one_newsletter, remove_newsletter
 

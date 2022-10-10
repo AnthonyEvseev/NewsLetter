@@ -19,8 +19,3 @@ async def post_user(id_news: int, db: session = Depends(connect_db)):
 @message_router.get('/message_by_status', summary="message_by_status")
 async def post_user(status_news: str, db: session = Depends(connect_db)):
     return message_status(status_news, db)
-
-
-# @message_router.get('/status', summary="status")
-# def all_newsletter(db: session = Depends(connect_db)):
-#     return check_status_message(db)
