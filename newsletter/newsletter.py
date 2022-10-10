@@ -45,10 +45,7 @@ def create_task(id_news: int, delta_time: datetime, text: str, tag: str, code: s
     try:
         user_data = create_user_data(tag, code, db)
         for user_id, phone in user_data.items():
-            try:
-                task = send_messages.delay(delta_time.seconds, user_id, phone, text)
-            except Exception as exc:
-                raise send_messages.retry(exc=exc, countdown=60)
+            task = send_messages.delay(delta_time.seconds, user_id, phone, text)
             time_start = delta_time + datetime.datetime.now()
             status_task = AsyncResult(task.id)
             status = str(status_task.status)
