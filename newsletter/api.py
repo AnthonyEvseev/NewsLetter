@@ -1,17 +1,27 @@
 from datetime import time, datetime, date, timedelta
 from fastapi import APIRouter, Depends, Query
 from core.database import session, connect_db
-from newsletter.newsletter import create_task, found_user
-from newsletter.crud import create_newsletter_db
+from newsletter.newsletter import create_task
+from newsletter.crud import create_newsletter_db, get_all_newsletter, get_one_newsletter, remove_newsletter
 
 newsletter_router = APIRouter()
 
 
-@newsletter_router.get('/send_message', summary="send_message")
-async def create_newsletter(id_news: int, text: str, date_start: date, time_start: time, date_stop: date,
-                            time_stop: time, tag: str,
-                            code: str = Query(max_length=3),
-                            db: session = Depends(connect_db)):
+@newsletter_router.get('/all_newsletter', summary="all_newsletter")
+def all_newsletter(db: session = Depends(connect_db)):
+    return get_all_newsletter(db)
+
+
+@newsletter_router.get('/get_info_newsletter', summary="get_info_newsletter")
+def get_newsletter(id_news: int, db: session = Depends(connect_db)):
+    return get_one_newsletter(id_news, db)
+
+
+@newsletter_router.get('/create_newsletter', summary="create_newsletter")
+def create_newsletter(id_news: int, text: str, date_start: date, time_start: time, date_stop: date,
+                      time_stop: time, tag: str,
+                      code: str = Query(max_length=3),
+                      db: session = Depends(connect_db)):
     _date_start = datetime(date_start.year, date_start.month, date_start.day, time_start.hour, time_start.minute,
                            time_start.second)
 
@@ -21,7 +31,6 @@ async def create_newsletter(id_news: int, text: str, date_start: date, time_star
     if _date_start <= datetime.now() <= _date_stop:
         timer_start = timedelta(seconds=1)
 
-        # create_task(id_news, timer_start, text, tag, code, db)
         try:
             create_newsletter_db(id_news, _date_start, _date_stop, text, tag, code, db)
             create_task(id_news, timer_start, text, tag, code, db)
@@ -38,3 +47,20 @@ async def create_newsletter(id_news: int, text: str, date_start: date, time_star
             return {'response 200': f'Рассылка будет запущена {_date_start}'}
         except:
             return {'response 400': 'ID рассылки уже существует'}
+
+
+@newsletter_router.put('/put_newsletter', summary="put_newsletter")
+def put_newsletter(id_news: int, text: str, date_start: date, time_start: time, date_stop: date,
+                   time_stop: time, tag: str,
+                   code: str = Query(max_length=3),
+                   db: session = Depends(connect_db)):
+    try:
+        remove_newsletter(id_news, db)
+        create_newsletter(id_news, text, date_start, time_start, date_stop, time_stop, tag, code, db)
+    except:
+        return {'response 400': 'Какая-то ошибка'}
+
+
+@newsletter_router.delete('/all_newsletter', summary="delete_all_newsletter")
+def all_newsletter(id_news: int, db: session = Depends(connect_db)):
+    return remove_newsletter(id_news, db)

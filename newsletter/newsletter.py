@@ -40,17 +40,15 @@ def send_messages(time_start, user_id, phone, text):
         raise {'response 400': 'Ошибка внешнего сервиса'}
 
 
-# def create_task(time_start, text: str, tag: str, code: str = Query(max_length=3), db: session = Depends(connect_db)):
-#     user_data = create_user_data(tag, code, db)
-#     for user_id, phone in user_data.items():
-#         send_messages.delay(time_start, user_id, phone, text)
-
 def create_task(id_news: int, delta_time: datetime, text: str, tag: str, code: str = Query(max_length=3),
                 db: session = Depends(connect_db)):
     try:
         user_data = create_user_data(tag, code, db)
         for user_id, phone in user_data.items():
-            task = send_messages.delay(delta_time.seconds, user_id, phone, text)
+            try:
+                task = send_messages.delay(delta_time.seconds, user_id, phone, text)
+            except Exception as exc:
+                raise send_messages.retry(exc=exc, countdown=60)
             time_start = delta_time + datetime.datetime.now()
             status_task = AsyncResult(task.id)
             status = str(status_task.status)
