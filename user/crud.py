@@ -1,15 +1,15 @@
 from fastapi import Depends
 from core.database import session, connect_db
 from core.models import UserModel
-from .schemas import UserSchemas, UserIDSchemas
+from .schemas import UserSchemas
 
 
 def get_user(db: session):
     return db.query(UserModel).all()
 
 
-def get_user_by_id(schemas: UserIDSchemas, db: session = Depends(connect_db)):
-    return db.query(UserModel).filter(UserModel.id == schemas.id).first()
+def get_user_by_id(id_user: int, db: session = Depends(connect_db)):
+    return db.query(UserModel).filter(UserModel.id == id_user).first()
 
 
 def create_user(schemas: UserSchemas, db: session = Depends(connect_db)):
@@ -24,8 +24,8 @@ def create_user(schemas: UserSchemas, db: session = Depends(connect_db)):
         raise {'resource': 400}
 
 
-def update_user(schemas: UserSchemas, db: session = Depends(connect_db)):
-    _user = get_user_by_id(schemas, db)
+def update_user(id_user: int, schemas: UserSchemas, db: session = Depends(connect_db)):
+    _user = get_user_by_id(id_user, db)
     _user.phone_number = schemas.phone_number
     _user.operator_code = schemas.phone_number[1:4]
     _user.tags = schemas.tags
@@ -36,7 +36,7 @@ def update_user(schemas: UserSchemas, db: session = Depends(connect_db)):
     return _user
 
 
-def remove_book(schemas, db: session = Depends(connect_db)):
-    _user = get_user_by_id(schemas, db)
+def remove_book(id_user: int, db: session = Depends(connect_db)):
+    _user = get_user_by_id(id_user, db)
     db.delete(_user)
     db.commit()

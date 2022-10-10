@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Response, Depends
-from user.schemas import UserSchemas, UserIDSchemas
+from user.schemas import UserSchemas
 from core.database import session, connect_db
 from user.crud import create_user, get_user, update_user, remove_book
 
@@ -20,7 +20,6 @@ async def get_users(response: Response, db: session = Depends(connect_db)):
 async def post_user(schemas: UserSchemas, response: Response, db: session = Depends(connect_db)):
     """
         Инструкция:
-        - **id**: НЕ ЗАПОЛНЯТЬ =)
         - **phone_number**: вводиться в формате 7XXXXXXXXXX (X - цифра от 0 до 9)
         - **code**: заполняется автоматически
         - **tags**: список доступных сотовых операторов 'beeline', 'mts', 'megafon', 'tele2'
@@ -35,7 +34,7 @@ async def post_user(schemas: UserSchemas, response: Response, db: session = Depe
 
 
 @user_router.put('/user', summary="Update user information")
-async def put_user(schemas: UserSchemas, response: Response, db: session = Depends(connect_db)):
+async def put_user(id_user: int, schemas: UserSchemas, response: Response, db: session = Depends(connect_db)):
     """
             Инструкция:
             - **phone_number**: вводиться в формате 7XXXXXXXXXX (X - цифра от 0 до 9)
@@ -44,17 +43,17 @@ async def put_user(schemas: UserSchemas, response: Response, db: session = Depen
             - **time_zone**: укажите свой город'
     """
 
-    _user = update_user(schemas, db)
+    _user = update_user(id_user, schemas, db)
     response.status_code = status.HTTP_200_OK
     return f'Клиент {_user.id} обновлён!'
 
 
 @user_router.delete('/user', summary="Delete user information")
-async def delete_user(schemas: UserIDSchemas, response: Response, db: session = Depends(connect_db)):
+async def delete_user(id_user: int, response: Response, db: session = Depends(connect_db)):
     """
             Инструкция:
             - **id**: По указанному id будет найден и удалён клиент
     """
-    remove_book(schemas, db)
+    remove_book(id_user, db)
     response.status_code = status.HTTP_200_OK
     return 'Клиент удалён'

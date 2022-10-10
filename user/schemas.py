@@ -10,11 +10,7 @@ class OperatorTags(str, Enum):
     Tele2 = 'tele2'
 
 
-class UserIDSchemas(BaseModel):
-    id: Optional[int] = None
-
-
-class UserSchemas(UserIDSchemas):
+class UserSchemas(BaseModel):
     phone_number: str
     tags: OperatorTags
     time_zone: str
